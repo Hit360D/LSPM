@@ -1,15 +1,18 @@
 from tkinter import *
+from tkinter import ttk
 import mysql.connector
 
 #window
 win = Tk()
-win.geometry('1000x1000')
+win.geometry('700x500')
 win.title('LSPM - Least Secure Password Manager')
+
+style = ttk.Style(win)
 
 #---------------------------------------------#
 
-#command module
-def sql_command(type):
+#command module (under parent = cframe)
+def sql_command(selection):
 	connection = mysql.connector.connect(host='localhost', database='suryansh', user='suryansh', password='suryansh')
 
 	if connection.is_connected():
@@ -17,7 +20,14 @@ def sql_command(type):
 		cursor = connection.cursor()
 		cursor.execute("select database();")
 		record = cursor.fetchone()
-		return (db_Info, record)
+
+		#sql queries
+		create_table_query = "SHOW tables"
+		cursor = connection.cursor()
+		result = cursor.execute(create_table_query)
+		table = cursor.fetchall()
+		return table
+
 
 
 #---------------------------------------------#
@@ -44,12 +54,27 @@ def render_frame(selection):
 #---------------------------------------------#
 
 def show_tables(selection):
-	cframe = Frame(frame, width=500, height=500)
+	#remove the frame if it already exists
+	for child in frame.winfo_children():
+		child.destroy()
 
-	output = Entry(cframe, borderwidth=0)
-	db_Info, record = sql_command(selection)
-	output.insert(0, "Connected to MySQL Database version " + db_Info)
-	output.pack()
+	cframe = Frame(frame, width=500, height=500, bg="#444444")
+
+	#ttk treeview
+	tree = ttk.Treeview(cframe)
+
+	table_label = Label(cframe, text="Tables", fg="white", bg="#444444")
+	
+	#change treeview style
+	style.configure("Treeview", relief="flat", bg = "#444444", fieldbackground="#444444", fg="#444444")
+
+	#get tables
+	sql_tables = sql_command(selection)
+	for x in sql_tables:
+		tree.insert("", 0, text=x)
+
+	table_label.pack()
+	tree.pack(side='top', fill='x')
 
 	cframe.pack(expand='true', fill='both', side='top')
 
@@ -66,6 +91,7 @@ sidebar = Frame(win, width=200, height=500, bg='#111111')
 selection = "nothing"
 def getSel(event):
 	selection = str(listbox.get(listbox.curselection()))
+	#render frame based on selection
 	render_frame(selection)
 
 #list
@@ -79,6 +105,7 @@ listbox.insert(5, "Find an entry")
 listbox.insert(6, "Show all entries")
 listbox.insert(7, "Remove table")
 
+#get list selection
 listbox.bind('<<ListboxSelect>>', getSel)
 
 listbox.pack()
