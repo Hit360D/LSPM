@@ -115,11 +115,17 @@ def find_password(selection):
     #remove the frame if it already exists
     for child in frame.winfo_children():
         child.destroy()
+
+    #to fill tree with tuples
+    def show_table(table):
+        for x in table:
+            tree.insert("", 0, text=x)
     
     
     #button1 function
-    def btn_input_one(text_input):
-        
+    def btn_input_one(text1): 
+
+        text_input = text1.get("1.0", "end-1c")
 
         connection = mysql.connector.connect(host='localhost',
                                          database='suryansh',
@@ -129,17 +135,13 @@ def find_password(selection):
             cursor = connection.cursor(buffered = True)
             cursor.execute("select database();")
 
+
             #sql queries
-            create_table_query = "SELECT * FROM " + text_input
+            create_table_query = "select * from " + text_input
             cursor = connection.cursor(buffered = True)
             result = cursor.execute(create_table_query)
             table = cursor.fetchall()
             show_table(table)
-
-        #to fill tree with tuples
-        def show_table(table):
-            for x in table:
-                tree.insert("", 0, text=x)
 
 
     #subframe
@@ -154,9 +156,7 @@ def find_password(selection):
     text1 = Text(cframe, height=1, width=100)
     text1.pack(side='top')
 
-    text_input = text1.get("1.0", "end-1c")
-
-    button1 = Button(cframe, text='Show all content', command=lambda: btn_input_one(text_input))
+    button1 = Button(cframe, text='Show all content', command=lambda: btn_input_one(text1))
     button1.pack(side='top')
 
 
@@ -189,8 +189,6 @@ def find_password(selection):
 
 
     cframe.pack(expand='true', fill='both', side='top')
-
-    #TO FILL THE TREEVIEW - https://stackoverflow.com/questions/47515014/how-do-i-use-tkinter-treeview-to-list-items-in-a-table-of-a-database
 
 
 
