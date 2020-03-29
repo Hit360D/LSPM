@@ -116,12 +116,10 @@ def find_password(selection):
     for child in frame.winfo_children():
         child.destroy()
 
-    #to fill tree with tuples
+    #to fill treeview
     def show_table(table):
         for x in table:
-            item = x.split(" ")
-            for y in range(3):
-                tree.insert("", "end", text=x[y])
+            tree.insert("", 'end', text=x[1], values=(x[2], x[3]))
     
     
     #button1 function
