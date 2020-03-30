@@ -116,10 +116,10 @@ def find_password(selection):
     for child in frame.winfo_children():
         child.destroy()
 
-    #to fill tree with tuples
+    #to fill treeview
     def show_table(table):
         for x in table:
-            tree.insert("", 0, text=x)
+            tree.insert("", 'end', text=x[1], values=(x[2], x[3]))
     
     
     #button1 function
@@ -143,6 +143,27 @@ def find_password(selection):
             table = cursor.fetchall()
             show_table(table)
 
+    def btn_input_two(text1, text2):
+
+        tree.delete(*tree.get_children())
+
+        text_one = text1.get("1.0", "end-1c")
+        text_two = text2.get("1.0", "end-1c")
+
+        connection = mysql.connector.connect(host='localhost', database='suryansh', user='suryansh', password='suryansh')
+
+        if connection.is_connected():
+            cursor = connection.cursor(buffered = True)
+            #connected to the database
+            cursor.execute("select database();")
+
+            #sql queries
+            create_table_query = "select * from " + text_one + " where website='" + text_two + "'"
+            cursor = connection.cursor(buffered = True)
+            result = cursor.execute(create_table_query)
+            table = cursor.fetchall()
+            show_table(table)
+            
 
     #subframe
     cframe = Frame(frame, width=500, height=500, bg='#444444')
@@ -169,7 +190,7 @@ def find_password(selection):
     text2 = Text(cframe, height=1, width=100)
     text2.pack(side='top')
 
-    button2 = Button(cframe, text='Find')
+    button2 = Button(cframe, text='Find', command=lambda: btn_input_two(text2, text1))
     button2.pack(side='top')
 
 
